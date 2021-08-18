@@ -78,8 +78,9 @@ const addEmployee = () => {
 
 }
 
-const viewEmployee = () => {
-
+const displayTable = (table) => {
+  console.table(getTable(table));
+  init();
 }
 
 const viewRole = () => {
@@ -124,24 +125,24 @@ const init = async () => {
       addDepartment();
       break;
     case "View Employee":
-      if(checkTableEmpty("departments")) {
-        addRole();
+      if(checkTableEmpty("employees")) {
+        displayTable("employees")
       } else {
-        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
+        console.log("\nIt Seems like the currently are no employees saved.\nTry adding one!.\n")
         init();
       }
       break;
     case "View Role":
-      if(checkTableEmpty("departments")) {
-        addRole();
+      if(checkTableEmpty("roles")) {
+        displayTable("roles");
       } else {
-        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
+        console.log("\nIt Seems like the currently are no roles saved.\nTry adding one!.\n")
         init();
       }
       break;
     case "View Department":
       if(checkTableEmpty("departments")) {
-        viewDepartment();
+        displayTable("departments");
       } else {
         console.log("\nIt Seems like the currently are no departments saved.\nTry adding one!\n")
         init();
