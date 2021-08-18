@@ -10,7 +10,29 @@ const connection = mysql.createConnection({
   database: 'management'
 })
 
-const checkTable = (table) => {
+const mainQuestions = [
+  "Add Employee", 
+  "Add Role", 
+  "Add Department", 
+  "View Employee", 
+  "View Role", 
+  "View Department", 
+  "Update Employee", 
+  "Update Role", 
+  "Exit!"
+]
+
+const getTable = (table) => {
+  connection.query("SELECT * FROM ?", {Table: table}, (err, res) => {
+    if (res) {
+      return false;
+    } else {
+      return res;
+    }
+  });
+}
+
+const checkTableEmpty = (table) => {
   connection.query('SELECT * FROM ?', {Table: table}, (err, res) => {
     if (res) {
       return false;
@@ -20,37 +42,38 @@ const checkTable = (table) => {
   });
 }
 
-const addData = async () => {
-  
-  const { userChoice } =  await inquirer.prompt([
+
+
+const addDepartment = async () => {
+    const { name } = await inquirer.prompt([
+      {
+        type: "input",
+        message: "What is the name of the department you would like to add?",
+        name: "name"
+      }
+    ])
+    connection.query("INSERT INTO departments (name) VALUE (?)", {Name:name}, ((err,res) => {
+      if (err) throw err;
+      console.log(`A new Department with the name ${name} has been created?`)
+    }))
+}
+
+const addRole = async () => {
+  const { title, salary } = inquirer.prompt([
     {
-      type: "list",
-      message: "What table would you like to add data to?",
-      name: "userChoice",
-      choices: ["Employee", "Role", "Department"]
+      type: "input",
+      message: "What role would you like to add",
+      name: title
+    },
+    {
+      type: "input",
+      message: "What is the salary of this role?"
     }
   ])
-  switch (userChoice) {
-    case "Employee":
-      if(checkTable("roles")) {
-        addEmployee();
-      } else {
-        console.log("\nYou cannot added a Employee since there is no roles.\nTry adding a role first.\n")
-        addData();
-      }
-      break
-    case "Role":
-      if(checkTable("departments")) {
-        addRole();
-      } else {
-        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
-        addData();
-      }
-      break
-    case "Department":
-      addDepartment();
-      break
-  }
+  salary = parseFloat(salary).toFixed(2);
+  const depoTable = getTable("departments");
+  console.table(depoTable);
+
 }
 
 const viewData = () => {
@@ -67,25 +90,51 @@ const init = async () => {
       type: "list",
       message: "What would you like to do?",
       name: "userChoice",
-      choices: ["Add Data", "View Data", "Update Data"]
+      choices: mainQuestions
     }
   ])
   switch (userChoice) {
-    case "Add Data":
-      addData();
+    case "Add Employee":
+      if(checkTableEmpty("roles")) {
+        addEmployee();
+      } else {
+        console.log("\nYou cannot added a Employee since there is no roles.\nTry adding a role first.\n")
+        init();
+      }
+      break;
+    case "Add Role":
+      if(checkTableEmpty("departments")) {
+        addRole();
+      } else {
+        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
+        init();
+      }
+      break;
+    case "Add Department":
+      addDepartment();
+      break;
+    case "View Employee":
+      viewEmployee();
+      break;
+    case "View Role":
+      viewRole();
+      break;
+    case "View Department":
+      viewDepartment();
       break
-    case "View Data":
-      viewData();
-      break
-    case "Update Data":
+    case "Update Employee":
       updateData();
       break
+    case "Update Role":
+      updateRole();
+    case "Exit!":
+      connection.end();
   }
 }
 
 connection.connect((err) => {
   if (err) throw err;
   console.log('connect')
+  init();
 });
 
-init();
