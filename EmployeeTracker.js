@@ -11,14 +11,13 @@ const connection = mysql.createConnection({
 })
 
 const mainQuestions = [
-  "Add Employee", 
-  "Add Role", 
-  "Add Department", 
   "View Employee", 
   "View Role", 
   "View Department", 
-  "Update Employee", 
-  "Update Role", 
+  "Add Employee", 
+  "Add Role", 
+  "Add Department", 
+  "Update Employee Role", 
   "Exit!"
 ]
 
@@ -73,14 +72,25 @@ const addRole = async () => {
   salary = parseFloat(salary).toFixed(2);
   const depoTable = getTable("departments");
   console.table(depoTable);
+}
+
+const addEmployee = () => {
 
 }
 
-const viewData = () => {
+const viewEmployee = () => {
 
 }
 
-const updateData = () => {
+const viewRole = () => {
+
+}
+
+const viewDepartment = () => {
+
+}
+
+const updateEmployeeRole = () => {
 
 }
 
@@ -114,19 +124,32 @@ const init = async () => {
       addDepartment();
       break;
     case "View Employee":
-      viewEmployee();
+      if(checkTableEmpty("departments")) {
+        addRole();
+      } else {
+        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
+        init();
+      }
       break;
     case "View Role":
-      viewRole();
+      if(checkTableEmpty("departments")) {
+        addRole();
+      } else {
+        console.log("\nYou cannot added a Role since there is no Departments.\nTry adding a Department first.\n")
+        init();
+      }
       break;
     case "View Department":
-      viewDepartment();
+      if(checkTableEmpty("departments")) {
+        viewDepartment();
+      } else {
+        console.log("\nIt Seems like the currently are no departments saved.\nTry adding one!\n")
+        init();
+      }
+      break;
+    case "Update Employee Role":
+      updateEmployeeRole();
       break
-    case "Update Employee":
-      updateData();
-      break
-    case "Update Role":
-      updateRole();
     case "Exit!":
       connection.end();
   }
